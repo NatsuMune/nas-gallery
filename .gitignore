@@ -1,0 +1,32 @@
+# Go
+server/nas-gallery
+server/bin/
+*.test
+*.out
+coverage.*
+
+# Node
+web/node_modules/
+web/dist/
+web/dev-dist/
+web/coverage/
+web/playwright-report/
+web/test-results/
+
+# Runtime data (never commit)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.env
+.env.*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Orchestration scratch
+.orchestration/
