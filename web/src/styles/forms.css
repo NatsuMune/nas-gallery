@@ -1,0 +1,92 @@
+/* Login page + form details. */
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 36px 32px 32px;
+  border-radius: var(--radius-l);
+  background: rgba(19, 24, 36, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  animation: login-in var(--dur-2) var(--ease);
+}
+
+@keyframes login-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.login-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius-l);
+  background: linear-gradient(135deg, var(--accent), #2b56b3);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--glow);
+}
+
+.login-brand h1 {
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.login-sub {
+  color: var(--text-dim);
+  font-size: 13.5px;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.login-remember {
+  margin-top: -6px;
+}
+
+.login-error {
+  padding: 12px 14px;
+  border-radius: var(--radius-s);
+  background: rgba(255, 106, 122, 0.1);
+  border: 1px solid rgba(255, 106, 122, 0.35);
+  color: #ffa9b4;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.login-submit {
+  width: 100%;
+  padding: 13px;
+  font-size: 15px;
+}

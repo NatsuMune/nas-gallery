@@ -1,0 +1,220 @@
+/* Lightbox overlay + zoomable photo viewer. */
+
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(6, 8, 12, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  animation: lightbox-fade var(--dur-2) var(--ease);
+}
+
+@keyframes lightbox-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.lightbox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  animation: lightbox-rise var(--dur-2) var(--ease);
+}
+
+@keyframes lightbox-rise {
+  from {
+    transform: translateY(14px) scale(0.99);
+    opacity: 0.6;
+  }
+}
+
+.lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lightbox-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lightbox-name {
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-meta {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.lightbox-counter {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  margin-right: 6px;
+}
+
+.lightbox-action {
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.lightbox-action:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lightbox-action[aria-pressed='true'] {
+  color: #ff5f7a;
+}
+
+.lightbox-download {
+  display: grid;
+  place-items: center;
+}
+
+.lightbox-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(15, 19, 27, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease), background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+
+.lightbox-stage:hover .lightbox-nav,
+.lightbox-nav:focus-visible {
+  opacity: 1;
+}
+
+.lightbox-nav:hover {
+  background: rgba(30, 38, 54, 0.85);
+}
+
+.lightbox-nav-left {
+  left: 16px;
+}
+
+.lightbox-nav-right {
+  right: 16px;
+}
+
+.lightbox-nav-hidden {
+  opacity: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .lightbox-nav {
+    opacity: 1;
+    width: 40px;
+    height: 40px;
+  }
+  .lightbox-header {
+    padding: 10px 12px;
+  }
+}
+
+/* --- Photo viewer (zoom / pan / swipe) --- */
+
+.photo-viewer {
+  flex: 1;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  cursor: default;
+}
+
+.photo-viewer-zoomed {
+  cursor: grab;
+}
+
+.photo-viewer-dragging {
+  cursor: grabbing;
+}
+
+.photo-transform {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: grid;
+  place-items: center;
+  transition: transform var(--dur-2) var(--ease);
+  will-change: transform;
+}
+
+.photo-viewer-dragging .photo-transform,
+.photo-viewer.pinching .photo-transform {
+  transition: none;
+}
+
+.photo-transform img {
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 140px);
+  max-height: calc(100dvh - 140px);
+  object-fit: contain;
+  border-radius: var(--radius-s);
+  user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: var(--shadow-2);
+}
+
+@media (max-width: 640px) {
+  .photo-transform img {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 128px);
+    max-height: calc(100dvh - 128px);
+  }
+}
+
+.photo-skeleton {
+  position: absolute;
+  inset: 0;
+  min-width: 60vw;
+  min-height: 40vh;
+  z-index: -1;
+}
