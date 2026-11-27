@@ -1,6 +1,8 @@
 # Go
 server/nas-gallery
 server/bin/
+dist/
+*.spk
 *.test
 *.out
 coverage.*

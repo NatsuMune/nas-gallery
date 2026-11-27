@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+if [ "${wizard_delete_data:-false}" = "true" ]; then
+  rm -rf \
+    "${SYNOPKG_PKGVAR}/config.yaml" \
+    "${SYNOPKG_PKGVAR}/data" \
+    "${SYNOPKG_PKGVAR}/nas-gallery.log" \
+    "${SYNOPKG_PKGVAR}/nas-gallery.pid"
+fi
+
+exit 0

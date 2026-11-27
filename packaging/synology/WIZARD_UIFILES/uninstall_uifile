@@ -1,0 +1,18 @@
+[
+  {
+    "step_title": "Uninstall Options",
+    "items": [
+      {
+        "type": "multiselect",
+        "desc": "By default, your configuration, user accounts, favorites, and thumbnail cache are preserved so you can reinstall or upgrade later without losing anything.",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Delete configuration, database, user accounts, and thumbnail cache",
+            "value": false
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/yaml.v3"
 )
 
 const defaultConfigPath = "config.yaml"
@@ -26,10 +27,14 @@ const bcryptCost = 10
 func cmdInit(args []string) error {
 	fs := flag.NewFlagSet("init", flag.ContinueOnError)
 	cfgPath := fs.String("c", defaultConfigPath, "path of the config file to create/use")
+	listenAddr := fs.String("listen", "", "listenAddr to write when creating a new config")
+	serverName := fs.String("server-name", "", "serverName to write when creating a new config")
+	mediaPaths := fs.String("media", "", "comma-separated mediaPaths to write when creating a new config")
+	dataDir := fs.String("data-dir", "", "dataDir to write when creating a new config")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
-	created, err := writeExampleConfig(*cfgPath)
+	created, err := writeInitialConfig(*cfgPath, *listenAddr, *serverName, *mediaPaths, *dataDir)
 	if err != nil {
 		return err
 	}
@@ -72,6 +77,7 @@ func cmdUser(args []string) error {
 	sub, rest := args[0], args[1:]
 	fs := flag.NewFlagSet("user "+sub, flag.ContinueOnError)
 	cfgPath := fs.String("c", defaultConfigPath, "path of the config file")
+	pwEnv := fs.String("password-env", "", "environment variable holding password (for non-interactive setup)")
 	if err := fs.Parse(rest); err != nil {
 		return err
 	}
@@ -95,7 +101,7 @@ func cmdUser(args []string) error {
 		if len(positional) != 1 {
 			return errors.New("usage: nas-gallery user add <name>")
 		}
-		return userAdd(store, positional[0])
+		return userAdd(store, positional[0], *pwEnv)
 	case "list":
 		if len(positional) != 0 {
 			return errors.New("usage: nas-gallery user list")
@@ -111,24 +117,37 @@ func cmdUser(args []string) error {
 	}
 }
 
-func userAdd(store *Store, name string) error {
+func userAdd(store *Store, name, pwEnv string) error {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return errors.New("username must not be empty")
 	}
-	pw, err := readPassword("Password (min 4 chars): ")
-	if err != nil {
-		return fmt.Errorf("read password: %w", err)
-	}
-	if len(pw) < 4 {
-		return errors.New("password too short: minimum 4 characters")
-	}
-	confirm, err := readPassword("Confirm password: ")
-	if err != nil {
-		return fmt.Errorf("read password: %w", err)
-	}
-	if pw != confirm {
-		return errors.New("passwords do not match")
+	var pw string
+	if pwEnv != "" {
+		var ok bool
+		pw, ok = os.LookupEnv(pwEnv)
+		if !ok {
+			return fmt.Errorf("environment variable %q is not set", pwEnv)
+		}
+		if len(pw) < 4 {
+			return errors.New("password too short: minimum 4 characters")
+		}
+	} else {
+		var err error
+		pw, err = readPassword("Password (min 4 chars): ")
+		if err != nil {
+			return fmt.Errorf("read password: %w", err)
+		}
+		if len(pw) < 4 {
+			return errors.New("password too short: minimum 4 characters")
+		}
+		confirm, err := readPassword("Confirm password: ")
+		if err != nil {
+			return fmt.Errorf("read password: %w", err)
+		}
+		if pw != confirm {
+			return errors.New("passwords do not match")
+		}
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcryptCost)
 	if err != nil {
@@ -140,6 +159,48 @@ func userAdd(store *Store, name string) error {
 	}
 	fmt.Printf("user %q created (id %d)\n", name, id)
 	return nil
+}
+
+func writeInitialConfig(path, listenAddr, serverName, mediaCSV, dataDir string) (bool, error) {
+	if listenAddr == "" && serverName == "" && mediaCSV == "" && dataDir == "" {
+		return writeExampleConfig(path)
+	}
+	if _, err := os.Stat(path); err == nil {
+		return false, nil
+	} else if !os.IsNotExist(err) {
+		return false, fmt.Errorf("stat config: %w", err)
+	}
+	cfg := defaultConfig()
+	if strings.TrimSpace(listenAddr) != "" {
+		cfg.ListenAddr = strings.TrimSpace(listenAddr)
+	}
+	if strings.TrimSpace(serverName) != "" {
+		cfg.ServerName = strings.TrimSpace(serverName)
+	}
+	if strings.TrimSpace(dataDir) != "" {
+		cfg.DataDir = strings.TrimSpace(dataDir)
+	}
+	if strings.TrimSpace(mediaCSV) != "" {
+		for _, part := range strings.Split(mediaCSV, ",") {
+			if p := strings.TrimSpace(part); p != "" {
+				cfg.MediaPaths = append(cfg.MediaPaths, p)
+			}
+		}
+	}
+	if err := cfg.validate(); err != nil {
+		return false, err
+	}
+	body, err := yaml.Marshal(&cfg)
+	if err != nil {
+		return false, fmt.Errorf("marshal config: %w", err)
+	}
+	if err := os.MkdirAll(absOrSelf(path), 0o755); err != nil {
+		return false, fmt.Errorf("create config dir: %w", err)
+	}
+	if err := os.WriteFile(path, body, 0o600); err != nil {
+		return false, fmt.Errorf("write config: %w", err)
+	}
+	return true, nil
 }
 
 func userList(store *Store) error {

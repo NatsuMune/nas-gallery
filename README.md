@@ -24,6 +24,7 @@ Your media stays on your NAS and is only accessible after login.
 |---|---|
 | [`server/`](server/) | Static Go backend (API, auth, scanner, JPEG thumbs, HTTP Range streaming, CLI) |
 | [`web/`](web/) | React + TypeScript + Vite PWA frontend, mock API server, unit + Playwright e2e tests |
+| [`packaging/synology/`](packaging/synology/) | Synology DSM 7 `.spk` package builder, install/uninstall wizards, and lifecycle scripts |
 | [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) | Full HTTP API & server behavior specification |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System shape, auth model, and SQLite schema |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Step-by-step GitHub Pages + Synology DSM + Tailscale/Cloudflare deployment guide |

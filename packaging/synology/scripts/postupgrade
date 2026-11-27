@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+BIN="${SYNOPKG_PKGDEST}/bin/nas-gallery"
+CFG="${SYNOPKG_PKGVAR}/config.yaml"
+
+mkdir -p "${SYNOPKG_PKGVAR}"
+if [ -f "${CFG}" ]; then
+  "${BIN}" init -c "${CFG}"
+fi
+
+exit 0

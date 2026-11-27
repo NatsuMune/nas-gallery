@@ -39,7 +39,11 @@ jobs:
             echo "Building ${out}..."
             CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags="-s -w" -o "$out" .
           done
-          cd ../dist
+      - name: Build Synology DSM 7 SPK packages
+        working-directory: ${{ github.workspace }}
+        run: |
+          ./packaging/synology/build-spk.sh -v "${GITHUB_REF_NAME}" -o dist all
+          cd dist
           sha256sum nas-gallery-* > SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2
         with:

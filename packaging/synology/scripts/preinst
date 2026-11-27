@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+if [ "${SYNOPKG_PKG_STATUS:-INSTALL}" = "INSTALL" ]; then
+  if [ -n "${wizard_user2_name:-}" ] && [ "${#wizard_user2_password}" -lt 4 ]; then
+    msg="Second user password must be at least 4 characters when Second Username is set."
+    echo "$msg" >&2
+    if [ -n "${SYNOPKG_TEMP_LOGFILE:-}" ]; then
+      echo "$msg" > "$SYNOPKG_TEMP_LOGFILE"
+    fi
+    exit 1
+  fi
+fi
+
+exit 0

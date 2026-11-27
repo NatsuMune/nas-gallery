@@ -26,6 +26,12 @@ jobs:
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /dev/null .
           CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /dev/null .
+      - name: Verify Synology DSM 7 SPK build
+        working-directory: ${{ github.workspace }}
+        run: |
+          tmp=$(mktemp -d)
+          ./packaging/synology/build-spk.sh -o "$tmp" all
+          rm -rf "$tmp"
 
   web:
     name: Web PWA

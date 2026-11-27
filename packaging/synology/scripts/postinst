@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+BIN="${SYNOPKG_PKGDEST}/bin/nas-gallery"
+CFG="${SYNOPKG_PKGVAR}/config.yaml"
+DATA="${SYNOPKG_PKGVAR}/data"
+
+mkdir -p "${SYNOPKG_PKGVAR}"
+
+"${BIN}" init \
+  -c "${CFG}" \
+  -listen "${wizard_listen_addr:-0.0.0.0:8080}" \
+  -server-name "${wizard_server_name:-My NAS}" \
+  -media "${wizard_media_paths:-}" \
+  -data-dir "${DATA}"
+
+user_exists() {
+  "${BIN}" user list -c "${CFG}" | awk 'NR>1 {print $2}' | grep -Fxq "$1"
+}
+
+if [ -n "${wizard_username:-}" ] && [ -n "${wizard_password:-}" ]; then
+  if ! user_exists "${wizard_username}"; then
+    NAS_GALLERY_PW="${wizard_password}" "${BIN}" user add -c "${CFG}" -password-env NAS_GALLERY_PW "${wizard_username}"
+    unset NAS_GALLERY_PW
+  fi
+fi
+
+if [ -n "${wizard_user2_name:-}" ] && [ -n "${wizard_user2_password:-}" ]; then
+  if ! user_exists "${wizard_user2_name}"; then
+    NAS_GALLERY_PW="${wizard_user2_password}" "${BIN}" user add -c "${CFG}" -password-env NAS_GALLERY_PW "${wizard_user2_name}"
+    unset NAS_GALLERY_PW
+  fi
+fi
+
+exit 0

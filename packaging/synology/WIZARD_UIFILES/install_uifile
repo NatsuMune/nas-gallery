@@ -1,0 +1,95 @@
+[
+  {
+    "step_title": "Server & Library Settings",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Configure the NAS Gallery backend service.",
+        "subitems": [
+          {
+            "key": "wizard_server_name",
+            "desc": "Server Name",
+            "defaultValue": "My NAS",
+            "validator": {
+              "allowBlank": false
+            }
+          },
+          {
+            "key": "wizard_listen_addr",
+            "desc": "Listen Address (use 127.0.0.1:8080 for tunnel-only, or 0.0.0.0:8080 for LAN + tunnel)",
+            "defaultValue": "0.0.0.0:8080",
+            "validator": {
+              "allowBlank": false
+            }
+          },
+          {
+            "key": "wizard_media_paths",
+            "desc": "Media Folder Paths (comma-separated, e.g. /volume1/photo,/volume1/video). After install, grant Read-only permission to the 'nas-gallery' System internal user in Control Panel > Shared Folder.",
+            "defaultValue": "/volume1/photo",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "User Accounts",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Create your primary login account (used to sign in from the PWA).",
+        "subitems": [
+          {
+            "key": "wizard_username",
+            "desc": "Username",
+            "defaultValue": "admin",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },
+      {
+        "type": "password",
+        "subitems": [
+          {
+            "key": "wizard_password",
+            "desc": "Password (min 4 characters)",
+            "validator": {
+              "allowBlank": false,
+              "minLength": 4
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Optional second user account (for example, a spouse or family member — leave blank to skip).",
+        "subitems": [
+          {
+            "key": "wizard_user2_name",
+            "desc": "Second Username (optional)",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      },
+      {
+        "type": "password",
+        "subitems": [
+          {
+            "key": "wizard_user2_password",
+            "desc": "Second Password (min 4 characters if username is set)",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

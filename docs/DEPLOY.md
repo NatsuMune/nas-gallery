@@ -19,16 +19,40 @@ Your photos and videos never leave your NAS except when streamed to a signed-in 
 
 ---
 
-## Step 2 — Install & Configure the Backend on Synology DSM (No Docker)
+## Step 2 — Install & Manage the Backend on Synology DSM (No Docker)
 
-### Which binary?
+### Which architecture?
 
-- Most Intel/AMD Synology models (DS220+, DS423+, DS920+, DS923+, DS1522+, etc.): **`nas-gallery-linux-amd64`**
-- ARM64 Synology models (DS223, DS423, DS218, etc.): **`nas-gallery-linux-arm64`**
+- Most Intel/AMD Synology models (DS220+, DS423+, DS920+, DS923+, DS1522+, etc.): **`x86_64`** (`amd64`)
+- ARM64 Synology models (DS223, DS423, DS218, etc.): **`armv8`** (`arm64`)
 
-Check via SSH with `uname -m` (`x86_64` → `amd64`, `aarch64` → `arm64`).
+Check via DSM **Control Panel → Info Center** (CPU model) or SSH `uname -m` (`x86_64` → `x86_64`/`amd64`, `aarch64` → `armv8`/`arm64`).
 
-### Setup over SSH
+### Option 1 (Recommended): Install as a Native DSM 7 Package (`.spk`)
+
+1. Download **`nas-gallery-<version>-x86_64.spk`** (or **`-armv8.spk`**) from GitHub Releases, or build it locally from your machine:
+
+   ```bash
+   ./packaging/synology/build-spk.sh -v 1.0.0-0001 -o dist all
+   ```
+
+2. Open **DSM → Package Center → Manual Install** and upload the `.spk` file.
+3. Complete the **Install Wizard**:
+   - **Server Name:** e.g. `My NAS`
+   - **Listen Address:** `0.0.0.0:8080` (allows both LAN + tunnel) or `127.0.0.1:8080` (tunnel-only)
+   - **Media Folder Paths:** comma-separated paths, e.g. `/volume1/photo/PS5`
+   - **User Accounts:** create your primary account and an optional second account (e.g. for your spouse)
+4. **Grant Read permission to the package's system user:**
+   - Open **DSM → Control Panel → Shared Folder**.
+   - Select your media shared folder (e.g. `photo`) → **Edit → Permissions**.
+   - Change the dropdown from *Local users* to **System internal user**.
+   - Grant **Read only** (or Read/Write) to **`nas-gallery`** (`sc-nas-gallery`) and click **Save**.
+5. **Manage directly in DSM Package Center:**
+   - Start, Stop, Restart, View Log, Upgrade (preserves your config, users, and database), and Uninstall (choose whether to keep or delete data).
+   - Starts automatically on NAS boot — no Task Scheduler script needed.
+   - If you ever want to add more users or adjust `config.yaml` later over SSH, the package files live at `/var/packages/nas-gallery/target/bin/nas-gallery` and `/var/packages/nas-gallery/var/config.yaml`.
+
+### Option 2: Standalone Binary over SSH (Manual Setup)
 
 1. Download the binary from GitHub Releases (or cross-compile locally from `server/`):
 
